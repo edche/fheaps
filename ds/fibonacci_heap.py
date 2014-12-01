@@ -13,7 +13,7 @@ class FibonacciHeap:
       first = self.roots[0]
       last = self.roots[0]
       if len(self.roots) > 1:
-        last = roots[-1]
+        last = self.roots[-1]
       first.left = x
       last.right = x
       x.left = last
@@ -43,18 +43,16 @@ class FibonacciHeap:
     if self.roots is None:
       return min_el
     
-    ranks = []
-    for i in range(len(self.roots)):
-      ranks.append(None)
+    ranks = [None]*(self.__max_degree(self.n) + 1)
+    orig_roots = []
+    orig_roots.extend(self.roots)
 
-    for x in self.roots:
+    for x in orig_roots:
       r = x.rank
-      while ranks[r] != None:
+      while ranks[r] is not None:
         y = ranks[r]
-        if y.value < x.value:
-          __link(y,x)
-        else:
-          __link(x,y)
+        x,y = min(x,y), max(x,y)
+        self.__link(x,y)
         ranks[r] = None
         r += 1
       ranks[r] = x      
@@ -152,7 +150,7 @@ class FibonacciHeap:
     y.mark = False
     self.roots.remove(y)
 
-  def __max_degree(n):
+  def __max_degree(self,n):
     """ 
     Upper bound is floor(lg(n))
     """
@@ -175,7 +173,7 @@ class FibonacciHeapNode:
     self.right = self
     self.mark = False
 
-def tree_test():
+def print_test():
   a = FibonacciHeapNode(6)
   b = FibonacciHeapNode(9)
   c = FibonacciHeapNode(12)
@@ -239,10 +237,62 @@ def tree_test():
   k.child = m
 
   fheap.insert(g)
-  
-
   fheap.print_trees()
 
+def delete_min_test():
+  a = FibonacciHeapNode(3)
+  b = FibonacciHeapNode(4)
+  c = FibonacciHeapNode(5)
+  d = FibonacciHeapNode(14)
+
+  a.child = b
+  b.parent = a
+  c.parent = a
+  d.parent = b
+  b.child = d
+
+  b.left = c
+  b.right = c
+  c.left = b
+  c.right = b
+
+  e = FibonacciHeapNode(6)
+  f = FibonacciHeapNode(7)
+  g = FibonacciHeapNode(18)
+  h = FibonacciHeapNode(11)
+  
+  e.child = f
+  f.parent = e
+  g.parent = e
+  h.parent = f
+  f.child = h
+
+  f.left = g
+  f.right = g
+  g.left = f
+  g.right = f
+
+  i = FibonacciHeapNode(8)
+  j = FibonacciHeapNode(10)
+
+  j.parent = i
+  i.child = j
+
+  k = FibonacciHeapNode(12)
+
+  fheap = FibonacciHeap()
+  fheap.insert(a)
+  fheap.insert(e)
+  fheap.insert(i)
+  fheap.insert(k)
+  fheap.n = 11
+  a.rank = 2
+  b.rank = 1
+  e.rank = 2
+  f.rank = 1
+  i.rank = 1
+  fheap.delete_min()
+  fheap.print_trees()
 
 if __name__ == "__main__":
-  tree_test()
+  delete_min_test()
