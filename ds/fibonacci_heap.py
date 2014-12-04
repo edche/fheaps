@@ -32,21 +32,21 @@ class FibonacciHeap:
     # Linking and finding new min
     if self.roots is None:
       return min_el
-    # If value is -Inf, then this was invoked from delete. Do not perform linking
-    if min_el.value != float('-inf'):
-      ranks = [None]*(self.__max_degree(self.n) + 1)
-      orig_roots = []
-      orig_roots.extend(self.roots)
+    
+    
+    ranks = [None]*(self.__max_degree(self.n) + 1)
+    orig_roots = []
+    orig_roots.extend(self.roots)
 
-      for x in orig_roots:
-        r = x.rank
-        while ranks[r] is not None:
-          y = ranks[r]
-          x,y = min(x,y), max(x,y)
-          self.__link(x,y)
-          ranks[r] = None
-          r += 1
-        ranks[r] = x      
+    for x in orig_roots:
+      r = x.rank
+      while ranks[r] is not None:
+        y = ranks[r]
+        x,y = min(x,y), max(x,y)
+        self.__link(x,y)
+        ranks[r] = None
+        r += 1
+      ranks[r] = x      
 
     #Update new minimum
     new_min = self.roots[0]
