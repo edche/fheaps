@@ -1,5 +1,6 @@
 import math
-class Node:
+from heap import Heap, Node
+class QuakeHeapNode(Node):
   def __init__(self, val):
     self.value = val
     self.left = None # Left Child
@@ -7,7 +8,7 @@ class Node:
     self.parent = None
     self.height = 0
 
-class QuakeHeap():
+class QuakeHeap(Heap):
   def __init__(self, alpha = 0.75):
     if alpha >= 1 or alpha <= 0.5:
       print 'Invalid alpha. Alpha in (0.5, 1). Setting alpha to 0.75'
@@ -26,19 +27,18 @@ class QuakeHeap():
       self.minimum = x
     self.n += 1
 
-  def decrease_key(self, x, diff):
+  def decrease_key(self, x, new_val):
     """ 
-    Sets value of x to x.value - diff
+    Sets value of x.value to new_val if new_val <= x.value 
     After updating value, cut its subtree out and make new tree
     """
-    if diff < 0:
-      print 'Diff must be non-negative'
+    assert(new_val <= x.value)
     height = 0
     while x.parent and x.parent.value == x.value:
-      x.value -= diff
+      x.value = new_val
       x = x.parent
       height += 1
-    x.value -= diff
+    x.value = new_val 
     # After while loop, x will be highest node reflecting the value
     self.__cut(x)
     # Update minimum if necessary
@@ -54,20 +54,21 @@ class QuakeHeap():
     x = self.minimum
     if not x:
       return None
+    self.roots.remove(x)
+    self.minimum = None 
     left, right = x.left, x.right
     height = x.height
-    self.roots.remove(x)
-
+    
     while left or right:
       if left and left.value == x.value:
-        del left.parent
         right.height = height - 1
-        self.__cut(right)
+        if right:
+          self.__cut(right)
         left, right = left.left, left.right
-      else:
-        del left.parent
+      if right and right.value == x.value:
         left.height = height - 1
-        self.__cut(left)
+        if left:
+          self.__cut(left)
         left, right = right.left, right.right
       height -= 1
     self.n -= 1
@@ -77,15 +78,19 @@ class QuakeHeap():
     heights = [None] * (max_height + 1)
     orig_roots = []
     orig_roots.extend(self.roots)
-
     for root in orig_roots:
       h = root.height
       while heights[h]:
         y = heights[h]
-        self.__link(root,y)
+        root = self.__link(root,y)
         heights[h] = None
         h += 1
       heights[h] = root 
+
+    # Update minimum
+    for root in self.roots:
+      if self.minimum is None or root.value < self.minimum.value:
+        self.minimum = root
 
     # Check for quakes
     current_level = []
@@ -104,6 +109,10 @@ class QuakeHeap():
       else:
         current_level = parent_level
     return x.value
+  
+  @staticmethod
+  def make_node(value):
+    return QuakeHeapNode(value)
 
   def to_string(self):
     for root in self.roots:
@@ -119,13 +128,13 @@ class QuakeHeap():
             child_queue.append(left)
           if right:
             child_queue.append(right)
-          print job.value,
-          if job != print_queue[-1]:
+          if job != print_queue[0]:
             if job.parent == parent:
               print ' <-> ',
             else:
               print ' || ',
               parent = job.parent
+          print job.value,
         print_queue = child_queue
         print
       print '-----------------' 
@@ -158,7 +167,7 @@ class QuakeHeap():
         break
 
     min_val = min(x.value, y.value)
-    z = Node(min_val)
+    z = QuakeHeapNode(min_val)
     self.roots.append(z)
 
     z.left = x
@@ -166,30 +175,16 @@ class QuakeHeap():
     x.parent = z
     y.parent = z
     z.height = x.height + 1
+    return z
 
 def test():
-  qh = QuakeHeap()
-  a = Node(1)
-  b = Node(2)
-  c = Node(3)
-  qh.insert(a)
-  qh.insert(b)
-  qh.insert(c)
-  qh.delete_min()
-  d = Node(4)
-  e = Node(5)
-  f = Node(6)
-  qh.insert(d)
-  qh.insert(e)
-  qh.insert(f)
-  qh.decrease_key(f,6)
-  g = Node(1)
-  h = Node(1)
-  i = Node(1)
-  qh.insert(g)
-  qh.insert(h)
-  qh.insert(i)
-  qh.delete_min()
-  qh.to_string()
+  A = [1,2,3,4, 5, 6]
+  Q = QuakeHeap()
+  for a in A:
+    Q.insert(Q.make_node(a))
+  print "min value = " + str(Q.delete_min())
+  Q.to_string()
+  print "min value = " + str(Q.delete_min())
+  Q.to_string()
 
 if __name__ == '__main__': test()

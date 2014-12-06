@@ -1,4 +1,5 @@
 import math
+from heap import Heap, Node
 class HeapType:
   def compare(self, a, b):
     """True if a has priority over b"""
@@ -18,25 +19,41 @@ class MaxHeap(HeapType):
 min_heap = MinHeap()
 max_heap = MaxHeap()
 
-class BinaryHeap:
+class BinaryHeapNode(Node):
+  def __init__(self, value):
+    self.value = value
+
+class BinaryHeap(Heap):
   def __init__(self, heap_type = None, data = None):
     self.heap_type = heap_type
+    self.location = {}
     if not heap_type:
       self.heap_type = min_heap
     self.tree = []
     if data:
       self.__make_heap(data)
 
-  def insert(self, value):
-    self.tree.append(value)
+  def insert(self, node):
+    self.tree.append(node)
+    self.location[node] = len(self.tree)-1
     self.__up_heap(len(self.tree)-1)
 
-  def delete(self, i):
+  def delete(self, node):
+    i = self.location[node]
     last_idx = len(self.tree) -1
     # Move last element to subtree rooted at i
     self.tree[i] = self.tree[last_idx]
     del self.tree[-1]
     self.__down_heap(i)
+
+  def delete_min(self):
+    self.delete(self.tree[0])
+
+  def decrease_key(self, node, new_val):
+    assert(node.value >= new_val) 
+    i = self.location[node]
+    self.tree[i].value = new_val
+    self.__up_heap(i)
 
   def to_string(self):
     if len(self.tree) == 0:
@@ -46,7 +63,7 @@ class BinaryHeap:
     level = 1 
     n = len(self.tree)
     while idx < len(print_queue):
-      print self.tree[idx],
+      print self.tree[idx].value,
       left, right = self.__get_children(idx)
       if left < n:
         print_queue.append(left)
@@ -60,26 +77,29 @@ class BinaryHeap:
       elif idx != print_queue[-1]:
         print ' || ',
       idx += 1
+
+  def make_node(self, value):
+    return BinaryHeapNode(value)
   
   def __up_heap(self, i):
     parent = int(math.floor((i-1)/2))
-    if self.heap_type.compare(self.tree[i], self.tree[parent]):
+    if self.heap_type.compare(self.tree[i].value, self.tree[parent].value):
       self.__swap(i,parent)
       self.__up_heap(parent)
 
   def __down_heap(self,i):
     left, right = self.__get_children(i)
-    val = self.tree[i]
-    lval = self.tree[left]
-    rval = self.tree[right]
+    val = self.tree[i].value
+    lval = self.tree[left].value
+    rval = self.tree[right].value
     if self.heap_type.compare(lval, val) and self.heap_type.compare(rval, val):
       child = self.__get_preferred_child(left, right)
       self.__swap(child, i)
     elif self.heap_type.compare(lval, val):
-      self.swap(left, i)
+      self.__swap(left, i)
       self.__down_heap(left)
     elif self.heap_type.compare(rval, val):
-      self.swap(right, i)
+      self.__swap(right, i)
       self.__down_heap(right)
     else:
       return
@@ -88,7 +108,8 @@ class BinaryHeap:
     """
     Builds a heap out of array A
     """
-    self.tree = A
+    for el in A:
+      self.insert(BinaryHeapNode(el))
     n = len(A)
     for i in xrange(int(math.ceil(n/2)),-1,-1):
       self.__heapify(i)
@@ -102,7 +123,7 @@ class BinaryHeap:
     return left, right
   
   def __get_preferred_child(self, i, j):
-    if self.heap_type.compare(self.tree[i],self.tree[j]):
+    if self.heap_type.compare(self.tree[i].value,self.tree[j].value):
       return i
     else:
       return j
@@ -111,24 +132,26 @@ class BinaryHeap:
     left, right = self.__get_children(i) 
     top = i
     n = len(self.tree)
-    if left < n and self.heap_type.compare(self.tree[left], self.tree[top]):
+    if left < n and self.heap_type.compare(self.tree[left].value, self.tree[top].value):
       top = left
-    if right < n and self.heap_type.compare(self.tree[right], self.tree[top]): 
+    if right < n and self.heap_type.compare(self.tree[right].value, self.tree[top].value): 
       top = right
     if top != i:
       self.__swap(top, i)
       self.__heapify(top)
 
   def __swap(self, i, j):
-    temp = self.tree[j]
-    self.tree[j] = self.tree[i]
-    self.tree[i] = temp
+    self.location[self.tree[i]] = j
+    self.location[self.tree[j]] = i
+    self.tree[j], self.tree[i] = self.tree[i], self.tree[j]
   
 def test():
-  A = [1, 7, 9, 8 ,3, 5]
+  A = [1,2,3,4,5,6]
   heap = BinaryHeap(min_heap, A)
-  heap.insert(2)
-  heap.delete(0)
+  heap.insert(BinaryHeapNode(2))
+  heap.to_string()
+  heap.make_node(10)
+  heap.decrease_key(heap.tree[1],1)
   heap.to_string()
 if __name__ == '__main__': test()
 

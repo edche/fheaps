@@ -1,8 +1,23 @@
-class FibonacciHeap:
+from heap import Heap, Node
+        
+class FibonacciHeapNode(Node):
+  def __init__(self, value):
+    self.value = value
+    self.rank = 0
+    self.parent = None
+    self.child = None
+    self.left = self
+    self.right = self
+    self.mark = False
+
+class FibonacciHeap(Heap):
   def __init__(self):
     self.min = None
     self.n = 0
     self.roots = []
+
+  def make_node(self, value):
+    return FibonacciHeapNode(value)
 
   def insert(self, x):
     if self.min == None or self.min.value > x.value:
@@ -67,9 +82,8 @@ class FibonacciHeap:
     self.roots.extend(heap.roots)
 
   def decrease_key(self, node, val):
-    if val < 0:
-      print 'The decreased value must be >= 0'
-    node.value -= val
+    assert(val <= node.value)
+    node.value = val
     if node not in self.roots:      
       self.__cascading_cut(node)   
     #Check if we need to update min
@@ -80,7 +94,7 @@ class FibonacciHeap:
     if node == self.min:
       self.delete_min()
     else:
-      self.decrease_key(node, float('inf'))
+      self.decrease_key(node, float('-inf'))
       self.delete_min()
 
   def print_trees(self):
@@ -212,16 +226,6 @@ class FibonacciHeap:
         self.__cascading_cut(p)
       else:
         p.mark = True
-        
 
-class FibonacciHeapNode:
-  def __init__(self, value):
-    self.value = value
-    self.rank = 0
-    self.parent = None
-    self.child = None
-    self.left = self
-    self.right = self
-    self.mark = False
 
 
