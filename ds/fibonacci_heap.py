@@ -1,13 +1,13 @@
 from heap import Heap, Node
-        
+import random
+import math
+
 class FibonacciHeapNode(Node):
   def __init__(self, value):
     self.value = value
     self.rank = 0
     self.parent = None
-    self.child = None
-    self.left = self
-    self.right = self
+    self.children = []
     self.mark = False
 
 class FibonacciHeap(Heap):
@@ -20,13 +20,10 @@ class FibonacciHeap(Heap):
     return FibonacciHeapNode(value)
 
   def insert(self, x):
-    if self.min == None or self.min.value > x.value:
+    if self.min is None or self.min.value > x.value:
       self.min = x
     self.n += 1
-    self.__root_append(x) 
-    
-  def find_min(self):
-    return self.min   
+    self.roots.append(x)
 
   def delete_min(self):
     if self.min is None:
@@ -34,22 +31,19 @@ class FibonacciHeap(Heap):
 
     min_el = self.min
     self.roots.remove(min_el)
+    self.n -= 1
     
-    if min_el.child != None:
-      child_array = [min_el.child]
-      child = min_el.child.right
-   
-      while child != min_el.child:
-        child_array.append(child)
-        child = child.right    
-      self.roots.extend(child_array)
+    # Move children to root
+    for child in min_el.children:
+      child.parent = None
+    self.roots.extend(min_el.children)
     
     # Linking and finding new min
-    if self.roots is None:
+    if len(self.roots) == 0:
+      self.min = None
       return min_el
     
-    
-    ranks = [None]*(self.__max_degree(self.n) + 1)
+    ranks = [None]*(int(math.ceil(math.log(self.n, 2)) + 1))
     orig_roots = []
     orig_roots.extend(self.roots)
 
@@ -57,8 +51,7 @@ class FibonacciHeap(Heap):
       r = x.rank
       while ranks[r] is not None:
         y = ranks[r]
-        x,y = min(x,y), max(x,y)
-        self.__link(x,y)
+        x = self.__link(x,y)
         ranks[r] = None
         r += 1
       ranks[r] = x      
@@ -115,20 +108,14 @@ class FibonacciHeap(Heap):
       levels[root] = 0
       current_level = 0
       for job in print_queue:
-        # If starting a new level, print the previous leve
+        # If starting a new level, print the previous level
         if levels[job] != current_level:
           self.__print_level(level_nodes)
           level_nodes = []
           current_level = levels[job]
-        first_child = job.child
-        if first_child:
-          print_queue.append(first_child)
-          levels[first_child] = levels[job] + 1
-          child = first_child.right
-          while child != first_child:
-            print_queue.append(child)
+          print_queue.extend(job.children)
+          for child in job.children:
             levels[child] = levels[job] + 1
-            child = child.right
         level_nodes.append(job)
       # print out the leaf layer
       if len(level_nodes) > 0:
@@ -151,81 +138,52 @@ class FibonacciHeap(Heap):
   def __link(self, x, y):
     """
     Links the two trees together
-    Assumes x.value < y.value
     """
-    
-    # Removes y from doubly linked list in root list
-    y.left.right = y.right
-    y.right.left = y.left
-    y.parent = x
+    # Swap values if necessary
+    if x.value > y.value:
+      x,y = y,x
 
-    if x.child != None:
-      x.child.right.left = y
-      y.right = x.child.right
-      y.left = x.child
-      x.child.right = y
-    else:
-      x.child = y
-      x.child.right = y
-      x.child.left = y
+    y.parent = x
+    # Add y to list of x's children
+    x.children.append(y)
     x.rank += 1
     y.mark = False
     self.roots.remove(y)
-
-  def __max_degree(self,n):
-    """ 
-    Upper bound is floor(lg(n))
-    """
-    lg = 0
-    while n/2 > 0:
-      lg += 1
-      n = n/2
-    return lg
-  
-  def __root_append(self, x):
-    """
-    Appends x to the list of roots nodes and maintains circular linked list
-    """
-    # If x came from another list, fix the pointers in that list
-    x.left.right = x.right
-    x.right.left = x.left
-
-    if len(self.roots) == 0:
-      x.left = x
-      x.right = x
-    elif len(self.roots) == 1:
-      x.left = self.roots[0]
-      x.right = self.roots[0]
-      self.roots[0].left = x
-      self.roots[0].right = x
-    else:
-      last = self.roots[-1]
-      first = self.roots[0]
-      x.left = last
-      x.right = first
-      last.right = x
-      first.left = x
-    self.roots.append(x)
-
+    return x
+ 
   def __cascading_cut(self, x):
     # Cut x from its parent
     p = x.parent
-    if x.right != x and p.child == x:
-      p.child = x.right
-    elif p.child == x:
-      p.child = None
-    p.rank -= 1
-    x.parent = None
+    if p:
+      p.children.remove(x)
+      p.rank -= 1
+      x.parent = None
+      self.roots.append(x)
 
-    # Add x to list of roots
-    self.__root_append(x)
+      # If p is not a root, we need to check for further cascading cuts
+      if p not in self.roots:
+        if p.mark:
+          self.__cascading_cut(p)
+        else:
+          p.mark = True
 
-    # If p is not a root, we need to check for further cascading cuts
-    if p not in self.roots:
-      if p.mark:
-        self.__cascading_cut(p)
-      else:
-        p.mark = True
+def test():
+  f = FibonacciHeap()
+  nodes = []
+  for i in range(100):
+    nodes.append(f.make_node(random.random()))
+    f.insert(nodes[i])
+  for j in range(100):
+    if random.random() > 0.5:
+      x = f.delete_min()
+      nodes.remove(x)
+    else:
+      rand = random.randint(0,len(nodes)-1)
+      rand_node = nodes[rand]
+      f.decrease_key(rand_node, rand_node.value - random.random())
+
+if __name__ == '__main__':
+  test()
 
 
 

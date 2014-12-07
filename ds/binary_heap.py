@@ -38,19 +38,32 @@ class BinaryHeap(Heap):
     self.location[node] = len(self.tree)-1
     self.__up_heap(len(self.tree)-1)
 
-  def delete(self, node):
-    i = self.location[node]
-    last_idx = len(self.tree) -1
-    # Move last element to subtree rooted at i
-    self.tree[i] = self.tree[last_idx]
-    del self.tree[-1]
-    self.__down_heap(i)
-
   def delete_min(self):
-    self.delete(self.tree[0])
+    if len(self.tree) == 0:
+      return None
+    elif len(self.tree) == 1:
+      x = self.tree[0]
+      self.location = {}
+      self.tree = []
+      return x
+    else:
+      x = self.tree[0]
+      self.tree[0] = self.tree[-1]
+      self.tree.pop(-1)
+      for k in self.location:
+        self.location[k] -= 1
+      self.location[self.tree[0]] = 0
+      self.location.pop(x, None)
+      self.__down_heap(0)
+
+      return x
 
   def decrease_key(self, node, new_val):
     assert(node.value >= new_val) 
+    for k in self.location:
+      print str(k.value) + ' ',
+    print
+    print node.value
     i = self.location[node]
     self.tree[i].value = new_val
     self.__up_heap(i)
@@ -90,8 +103,12 @@ class BinaryHeap(Heap):
   def __down_heap(self,i):
     left, right = self.__get_children(i)
     val = self.tree[i].value
-    lval = self.tree[left].value
-    rval = self.tree[right].value
+    lval = float('inf')
+    rval = float('inf')
+    if left:
+      lval = self.tree[left].value
+    if right:
+      rval = self.tree[right].value
     if self.heap_type.compare(lval, val) and self.heap_type.compare(rval, val):
       child = self.__get_preferred_child(left, right)
       self.__swap(child, i)
@@ -120,6 +137,10 @@ class BinaryHeap(Heap):
     """
     left = 2*i + 1
     right = 2*i + 2
+    if left >= len(self.tree):
+      left = None
+    if right >= len(self.tree):
+      right = None
     return left, right
   
   def __get_preferred_child(self, i, j):

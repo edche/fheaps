@@ -73,7 +73,10 @@ class QuakeHeap(Heap):
       height -= 1
     self.n -= 1
 
-    max_height = int(math.ceil(math.log(self.n, 1/self.alpha)))
+    if self.n == 0:
+      return x.value
+
+    max_height = int(math.ceil(math.log(self.n, 2)))
     # Perform linking
     heights = [None] * (max_height + 1)
     orig_roots = []
