@@ -90,7 +90,7 @@ class FibonacciHeap(Heap):
       self.decrease_key(node, float('-inf'))
       self.delete_min()
 
-  def print_trees(self):
+  def to_string(self): 
     """
     Prints out the trees.
     New trees denoted with *s
