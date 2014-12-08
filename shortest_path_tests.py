@@ -3,6 +3,8 @@ import ds.binary_heap as bheap
 import ds.quake_heap as qheap
 import graph.graph as graph
 import random
+import datetime
+from operator import add
 
 BINARY_HEAP = 1
 FIBONACCI_HEAP = 2
@@ -42,7 +44,7 @@ def dijkstra(G, s, t, heap_type):
   while len(scanned) < n:    
     min_node = labelled.delete_min()
     if min_node is None:
-      return d, 'Unreachable'  
+      break
     for vertex in nodes:
       if nodes[vertex] == min_node:
         u = vertex
@@ -69,7 +71,7 @@ def dijkstra(G, s, t, heap_type):
   path.reverse()
   return d, path
   
-def test_a():
+def sanity():
   """
   Quick sanity checks
   G =
@@ -106,7 +108,7 @@ def test_a():
   print 'Quake Heap Path: ',
   print q_path
 
-def test(num_vertices, num_edges):
+def test(num_vertices, num_edges, verbose):
   V = range(num_vertices)
   E = []
   for i in range(num_edges):
@@ -121,27 +123,63 @@ def test(num_vertices, num_edges):
   s = random.choice(V)
   t = random.choice(V)
   
-  print 's = %d, t = %d' % (s,t)
+  result = "PASSED"
+  if verbose:
+    print 's = %d, t = %d' % (s,t)
 
+  b_start = datetime.datetime.now()
   b_dist, b_path = dijkstra(G, s, t, BINARY_HEAP)
-  print 'Binary Heap Solution: %f' % (b_dist[t])
-  print 'Binary Heap Path: ',
-  print b_path 
+  b_end = datetime.datetime.now()
+  b_time = (b_end - b_start).total_seconds()
+  if verbose:
+    print 'Binary Heap Solution: %f' % (b_dist[t])
+    print 'Binary Heap Path: ',
+    print b_path 
+    print 'Time: %f' % (b_time)
 
+  f_start = datetime.datetime.now()
   f_dist, f_path = dijkstra(G, s, t, FIBONACCI_HEAP)
-  print 'Fibonacci Heap Solution: %f' % (f_dist[t])
-  print 'Fibonacci Heap Path: ',
-  print f_path
+  f_end = datetime.datetime.now()
+  f_time = (f_end - f_start).total_seconds()
+  if verbose:
+    print 'Fibonacci Heap Solution: %f' % (f_dist[t])
+    print 'Fibonacci Heap Path: ',
+    print f_path
+    print 'Time: %f' % (f_time)
 
+  q_start = datetime.datetime.now()
   q_dist, q_path = dijkstra(G, s, t, QUAKE_HEAP)
-  print 'Quake Heap Solution: %f' % (q_dist[t])
-  print 'Quake Heap Path: ',
-  print q_path
+  q_end = datetime.datetime.now()
+  q_time = (q_end - q_start).total_seconds()
+  if verbose:
+    print 'Quake Heap Solution: %f' % (q_dist[t])
+    print 'Quake Heap Path: ',
+    print q_path
+  if not(b_dist[t] == f_dist[t] and f_dist[t] == q_dist[t]):
+    result = "FAILED"
+    print b_dist, f_dist, q_dist
+  if not(b_path == f_path and f_path == q_path):
+    result = "FAILED"
+    print b_path, f_path, q_path
+  return [b_time, f_time, q_time], result
 
 if __name__ == '__main__':
-  print "Test #1: |V| = 100, |E| = 1000"
-  test(100,1000)
+  verbose = False 
+  num_vert = 500
+  num_edges = 5000
+  num_trials = 100
+  average_time = [0]*3
+  print 'Graph Description: |V| = %d, |E| = %d' % (num_vert, num_edges)
 
-  print "Test #2: |V| = 300, |E| = 50000"
-  test(300,50000)
+  for i in range(num_trials):    
+    times, result = test(num_vert,num_edges, verbose)
+    print "Trial #%d: " % (i)
+    print result
+    average_time = map(add, average_time, times)
+  for i in range(3):
+    average_time[i] /= num_trials
+  print 'Average Times for |V| = %d and |E| = %d:' % (num_vert, num_edges)
+  print 'Binary Heap: %f' % (average_time[0])
+  print 'Fibonacci Heap: %f ' % (average_time[1])
+  print 'Quake Heap %f ' % (average_time[2])
 
