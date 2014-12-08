@@ -21,6 +21,7 @@ class QuakeHeap(Heap):
     self.minimum = None
     self.n = 0
     self.name = 0
+    self.deleted = []
   
   def make_node(self, value):
     q = QuakeHeapNode(value)
@@ -60,6 +61,8 @@ class QuakeHeap(Heap):
         self.__update_heights(parent, sibling.height + 1)
       node.parent = None
       self.roots.append(node)
+      if node.name in self.deleted:
+        return "DECREASE KEY!"
     node.value = new_val
     self.__update_min()
 
@@ -74,7 +77,7 @@ class QuakeHeap(Heap):
       if leaf.name == x.name:
         min_node = leaf
         self.leaves.remove(leaf)
-        break
+        self.deleted.append(leaf.name)
 
     # Remove path of nodes storing x
     left,right = x.left, x.right
@@ -83,12 +86,14 @@ class QuakeHeap(Heap):
       if left and x.name == left.name:
         if right:
           right.parent = None
-          new_roots.append(right)
+          if right.name != x.name:
+            new_roots.append(right)
         left, right = left.left, left.right
       else:
         if left:
           left.parent = None
-          new_roots.append(left)
+          if left.name != x.name:
+            new_roots.append(left)
         left, right = right.left, right.right
 
     self.roots.extend(new_roots)
@@ -111,22 +116,22 @@ class QuakeHeap(Heap):
     self.__update_min()
 
     # Check for quakes
-    current_level = []
-    current_level.extend(self.leaves)
+    current_level = set() 
+    current_level.update(self.leaves)
 
     new_roots = []
 
     for i in range(max_height):
       n_current = len(current_level)
-      parent_level = []
+      parent_level = set()
       for node in current_level:
-        if node.parent and node.parent not in parent_level:
-          parent_level.append(node.parent)
+        if node.parent and node.parent.name == node.name: 
+          parent_level.add(node.parent)
         elif not node.parent:
           new_roots.append(node)
       n_parent = len(parent_level)
       if n_parent > self.alpha*n_current: 
-        self.roots = current_level
+        self.roots = list(current_level)
         self.roots.extend(new_roots)
         for root in self.roots:
           root.parent = None

@@ -24,7 +24,7 @@ def dijkstra(G, s, t, heap_type):
   """
   n = len(G.V)
   d = {} #temporary distance function
-  scanned = []
+  scanned = set()
   p = {} #Optimal path
   # Initialize distances to Infinity
   for v in G.V:
@@ -42,7 +42,6 @@ def dijkstra(G, s, t, heap_type):
   while len(scanned) < n:    
     min_node = labelled.delete_min()
     if min_node is None:
-
       return d, 'Unreachable'  
     for vertex in nodes:
       if nodes[vertex] == min_node:
@@ -60,7 +59,7 @@ def dijkstra(G, s, t, heap_type):
           else:
             nodes[w].value = d[w]
             labelled.insert(nodes[w])
-    scanned.append(u)
+    scanned.add(u)
   path = [t]
   node = t
 
@@ -143,6 +142,6 @@ if __name__ == '__main__':
   print "Test #1: |V| = 100, |E| = 1000"
   test(100,1000)
 
-  print "Test #2: |V| = 300, |E| = 3000"
+  print "Test #2: |V| = 300, |E| = 50000"
   test(300,50000)
 
