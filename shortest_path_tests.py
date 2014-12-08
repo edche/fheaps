@@ -1,22 +1,32 @@
 import ds.fibonacci_heap as fheap
-import ds.binary_heap as bheap
+#import ds.binary_heap as bheap
+import ds.dheap as dheap
 import ds.quake_heap as qheap
 import graph.graph as graph
 import random
 import datetime
 from operator import add
 
-BINARY_HEAP = 1
-FIBONACCI_HEAP = 2
-QUAKE_HEAP = 3
+BINARY_HEAP = 0
+FIBONACCI_HEAP = 1
+QUAKE_HEAP = 2
+FOUR_ARY_HEAP = 3
+EIGHT_ARY_HEAP = 4
+SIXTEEN_ARY_HEAP = 5
 
 def make_heap(heap_type):
   if heap_type == BINARY_HEAP:
-    return bheap.BinaryHeap()
+    return dheap.DHeap(2)
   elif heap_type == FIBONACCI_HEAP:
     return fheap.FibonacciHeap()
   elif heap_type == QUAKE_HEAP:
     return qheap.QuakeHeap()
+  elif heap_type == FOUR_ARY_HEAP:
+    return dheap.DHeap(4)
+  elif heap_type == EIGHT_ARY_HEAP:
+    return dheap.DHeap(8)
+  elif heap_type == SIXTEEN_ARY_HEAP:
+    return dheap.DHeap(16)
   else:
     print 'Heap type not supported'
 
@@ -65,7 +75,7 @@ def dijkstra(G, s, t, heap_type):
   path = [t]
   node = t
 
-  while node != s:
+  while node and node != s:
      node = p[node]
      path.append(node)
   path.reverse()
@@ -108,7 +118,7 @@ def sanity():
   print 'Quake Heap Path: ',
   print q_path
 
-def test(num_vertices, num_edges, verbose):
+def test(num_vertices, num_edges, heaps_to_test, verbose):
   V = range(num_vertices)
   E = []
   for i in range(num_edges):
@@ -127,59 +137,49 @@ def test(num_vertices, num_edges, verbose):
   if verbose:
     print 's = %d, t = %d' % (s,t)
 
-  b_start = datetime.datetime.now()
-  b_dist, b_path = dijkstra(G, s, t, BINARY_HEAP)
-  b_end = datetime.datetime.now()
-  b_time = (b_end - b_start).total_seconds()
-  if verbose:
-    print 'Binary Heap Solution: %f' % (b_dist[t])
-    print 'Binary Heap Path: ',
-    print b_path 
-    print 'Time: %f' % (b_time)
-
-  f_start = datetime.datetime.now()
-  f_dist, f_path = dijkstra(G, s, t, FIBONACCI_HEAP)
-  f_end = datetime.datetime.now()
-  f_time = (f_end - f_start).total_seconds()
-  if verbose:
-    print 'Fibonacci Heap Solution: %f' % (f_dist[t])
-    print 'Fibonacci Heap Path: ',
-    print f_path
-    print 'Time: %f' % (f_time)
-
-  q_start = datetime.datetime.now()
-  q_dist, q_path = dijkstra(G, s, t, QUAKE_HEAP)
-  q_end = datetime.datetime.now()
-  q_time = (q_end - q_start).total_seconds()
-  if verbose:
-    print 'Quake Heap Solution: %f' % (q_dist[t])
-    print 'Quake Heap Path: ',
-    print q_path
-  if not(b_dist[t] == f_dist[t] and f_dist[t] == q_dist[t]):
+  num_heaps = len(heaps_to_test)
+  dists = [None] * num_heaps
+  paths = [None] * num_heaps
+  times = [None] * num_heaps
+  for i in range(num_heaps):
+    dist, path, time = run_test(G,s,t,heaps_to_test[i])
+    dists[i] = dist
+    paths[i] = path
+    times[i] = time
+    
+  if not all(dists[0] == dist for dist in dists):
     result = "FAILED"
-    print b_dist, f_dist, q_dist
-  if not(b_path == f_path and f_path == q_path):
+    print dists
+  if not all(paths[0] == path for path in paths):
     result = "FAILED"
-    print b_path, f_path, q_path
-  return [b_time, f_time, q_time], result
+    print paths
+  return times, result
+
+def run_test(G, s, t, heap_type):
+  start = datetime.datetime.now()
+  dist, path = dijkstra(G,s,t, heap_type)
+  end = datetime.datetime.now()
+  time = (end - start).total_seconds()
+  return dist, path, time
 
 if __name__ == '__main__':
+  heaps_to_test = [BINARY_HEAP, FIBONACCI_HEAP, QUAKE_HEAP, FOUR_ARY_HEAP, EIGHT_ARY_HEAP, SIXTEEN_ARY_HEAP]
+  heap_names = {BINARY_HEAP: 'Binary Heap', FIBONACCI_HEAP: 'Fibonacci Heap', QUAKE_HEAP: 'Quake Heap', FOUR_ARY_HEAP: '4-ary Heap',
+      EIGHT_ARY_HEAP: '8-ary Heap', SIXTEEN_ARY_HEAP: '16-ary Heap'}
   verbose = False 
-  num_vert = 500
+  num_vert = 1000
   num_edges = 5000
   num_trials = 100
-  average_time = [0]*3
+  average_time = [0]*len(heaps_to_test)
   print 'Graph Description: |V| = %d, |E| = %d' % (num_vert, num_edges)
 
   for i in range(num_trials):    
-    times, result = test(num_vert,num_edges, verbose)
+    times, result = test(num_vert,num_edges, heaps_to_test, verbose)
     print "Trial #%d: " % (i)
     print result
     average_time = map(add, average_time, times)
-  for i in range(3):
+  for i in range(len(heaps_to_test)):
     average_time[i] /= num_trials
   print 'Average Times for |V| = %d and |E| = %d:' % (num_vert, num_edges)
-  print 'Binary Heap: %f' % (average_time[0])
-  print 'Fibonacci Heap: %f ' % (average_time[1])
-  print 'Quake Heap %f ' % (average_time[2])
-
+  for i in range(len(heaps_to_test)):
+    print heap_names[heaps_to_test[i]] + ': %f' % (times[i])

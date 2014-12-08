@@ -1,0 +1,208 @@
+Graph Description: |V| = 1000, |E| = 5000
+Trial #0: 
+PASSED
+Trial #1: 
+PASSED
+Trial #2: 
+PASSED
+Trial #3: 
+PASSED
+Trial #4: 
+PASSED
+Trial #5: 
+PASSED
+Trial #6: 
+PASSED
+Trial #7: 
+PASSED
+Trial #8: 
+PASSED
+Trial #9: 
+PASSED
+Trial #10: 
+PASSED
+Trial #11: 
+PASSED
+Trial #12: 
+PASSED
+Trial #13: 
+PASSED
+Trial #14: 
+PASSED
+Trial #15: 
+PASSED
+Trial #16: 
+PASSED
+Trial #17: 
+PASSED
+Trial #18: 
+PASSED
+Trial #19: 
+PASSED
+Trial #20: 
+PASSED
+Trial #21: 
+PASSED
+Trial #22: 
+PASSED
+Trial #23: 
+PASSED
+Trial #24: 
+PASSED
+Trial #25: 
+PASSED
+Trial #26: 
+PASSED
+Trial #27: 
+PASSED
+Trial #28: 
+PASSED
+Trial #29: 
+PASSED
+Trial #30: 
+PASSED
+Trial #31: 
+PASSED
+Trial #32: 
+PASSED
+Trial #33: 
+PASSED
+Trial #34: 
+PASSED
+Trial #35: 
+PASSED
+Trial #36: 
+PASSED
+Trial #37: 
+PASSED
+Trial #38: 
+PASSED
+Trial #39: 
+PASSED
+Trial #40: 
+PASSED
+Trial #41: 
+PASSED
+Trial #42: 
+PASSED
+Trial #43: 
+PASSED
+Trial #44: 
+PASSED
+Trial #45: 
+PASSED
+Trial #46: 
+PASSED
+Trial #47: 
+PASSED
+Trial #48: 
+PASSED
+Trial #49: 
+PASSED
+Trial #50: 
+PASSED
+Trial #51: 
+PASSED
+Trial #52: 
+PASSED
+Trial #53: 
+PASSED
+Trial #54: 
+PASSED
+Trial #55: 
+PASSED
+Trial #56: 
+PASSED
+Trial #57: 
+PASSED
+Trial #58: 
+PASSED
+Trial #59: 
+PASSED
+Trial #60: 
+PASSED
+Trial #61: 
+PASSED
+Trial #62: 
+PASSED
+Trial #63: 
+PASSED
+Trial #64: 
+PASSED
+Trial #65: 
+PASSED
+Trial #66: 
+PASSED
+Trial #67: 
+PASSED
+Trial #68: 
+PASSED
+Trial #69: 
+PASSED
+Trial #70: 
+PASSED
+Trial #71: 
+PASSED
+Trial #72: 
+PASSED
+Trial #73: 
+PASSED
+Trial #74: 
+PASSED
+Trial #75: 
+PASSED
+Trial #76: 
+PASSED
+Trial #77: 
+PASSED
+Trial #78: 
+PASSED
+Trial #79: 
+PASSED
+Trial #80: 
+PASSED
+Trial #81: 
+PASSED
+Trial #82: 
+PASSED
+Trial #83: 
+PASSED
+Trial #84: 
+PASSED
+Trial #85: 
+PASSED
+Trial #86: 
+PASSED
+Trial #87: 
+PASSED
+Trial #88: 
+PASSED
+Trial #89: 
+PASSED
+Trial #90: 
+PASSED
+Trial #91: 
+PASSED
+Trial #92: 
+PASSED
+Trial #93: 
+PASSED
+Trial #94: 
+PASSED
+Trial #95: 
+PASSED
+Trial #96: 
+PASSED
+Trial #97: 
+PASSED
+Trial #98: 
+PASSED
+Trial #99: 
+PASSED
+Average Times for |V| = 1000 and |E| = 5000:
+Binary Heap: 1.046741
+Fibonacci Heap: 1.088683
+Quake Heap: 3.533845
+4-ary Heap: 1.017200
+8-ary Heap: 1.002972
+16-ary Heap: 1.008923
