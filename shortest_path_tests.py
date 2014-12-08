@@ -22,7 +22,6 @@ def dijkstra(G, s, t, heap_type):
   """
   Single source shortest path algorithm from s to t
   """
-  print "START"
   n = len(G.V)
   d = {} #temporary distance function
   scanned = []
@@ -42,11 +41,13 @@ def dijkstra(G, s, t, heap_type):
   labelled.insert(nodes[s])
   while len(scanned) < n:    
     min_node = labelled.delete_min()
+    if min_node is None:
+
+      return d, 'Unreachable'  
     for vertex in nodes:
       if nodes[vertex] == min_node:
         u = vertex
         break
-    print "DELETE MIN %d" % (u)
     for w in G.adj[u]:      
       if w not in scanned:
         e = (u,w)
@@ -55,10 +56,8 @@ def dijkstra(G, s, t, heap_type):
           p[w] = u
           # Check to see if previously inserted
           if nodes[w].value != float('inf'):
-            print "DECREASE KEY(%d, %f)" %(w, d[w])
             labelled.decrease_key(nodes[w], d[w])
           else:
-            print "INSERT %d" % (w)
             nodes[w].value = d[w]
             labelled.insert(nodes[w])
     scanned.append(u)
@@ -69,7 +68,6 @@ def dijkstra(G, s, t, heap_type):
      node = p[node]
      path.append(node)
   path.reverse()
-  print "END"
   return d, path
   
 def test_a():
@@ -93,20 +91,58 @@ def test_a():
   for e in E:
     W[e] = random.random()
 
-  for k in W:
-    print k, W[k] 
-  G = graph.Graph(V, E, W, True)
+  G = graph.Graph(V, E, W)
   s = 1
   t = 9
   b_dist, b_path = dijkstra(G, s, t, BINARY_HEAP)
   f_dist, f_path = dijkstra(G, s, t, FIBONACCI_HEAP)
- # q_dist, q_path = dijkstra(G, s, t, QUAKE_HEAP)
+  q_dist, q_path = dijkstra(G, s, t, QUAKE_HEAP)
   print 'Binary Heap Solution: %f' % (b_dist[t])
   print 'Binary Heap Path: ',
   print b_path 
   print 'Fibonacci Heap Solution: %f' % (f_dist[t])
+  print 'Fibonacci Heap Path: ',
   print f_path
-  #print 'Quake Heap Solution: %f' % (q_dist[t])
-  #print q_path[t]
+  print 'Quake Heap Solution: %f' % (q_dist[t])
+  print 'Quake Heap Path: ',
+  print q_path
 
-if __name__ == '__main__': test_a()
+def test(num_vertices, num_edges):
+  V = range(num_vertices)
+  E = []
+  for i in range(num_edges):
+    u = random.randint(0,num_vertices-1)
+    rest = range(0,u) + range(u+1,num_vertices)
+    v = random.choice(rest)
+    E.append((u,v))
+  W = {}
+  for e in E:
+    W[e] = random.random()
+  G = graph.Graph(V,E,W, True)
+  s = random.choice(V)
+  t = random.choice(V)
+  
+  print 's = %d, t = %d' % (s,t)
+
+  b_dist, b_path = dijkstra(G, s, t, BINARY_HEAP)
+  print 'Binary Heap Solution: %f' % (b_dist[t])
+  print 'Binary Heap Path: ',
+  print b_path 
+
+  f_dist, f_path = dijkstra(G, s, t, FIBONACCI_HEAP)
+  print 'Fibonacci Heap Solution: %f' % (f_dist[t])
+  print 'Fibonacci Heap Path: ',
+  print f_path
+
+  q_dist, q_path = dijkstra(G, s, t, QUAKE_HEAP)
+  print 'Quake Heap Solution: %f' % (q_dist[t])
+  print 'Quake Heap Path: ',
+  print q_path
+
+if __name__ == '__main__':
+  print "Test #1: |V| = 100, |E| = 1000"
+  test(100,1000)
+
+  print "Test #2: |V| = 300, |E| = 3000"
+  test(300,50000)
+

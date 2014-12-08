@@ -31,7 +31,7 @@ class BinaryHeap(Heap):
     if not heap_type:
       self.heap_type = min_heap
     self.tree = [] # Use array to store
-
+  
   def make_node(self, value):
     return BinaryHeapNode(value)
 
