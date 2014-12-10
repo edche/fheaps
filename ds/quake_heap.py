@@ -21,7 +21,6 @@ class QuakeHeap(Heap):
     self.minimum = None
     self.n = 0
     self.name = 0
-    self.deleted = set() 
   
   def make_node(self, value):
     q = QuakeHeapNode(value)
@@ -62,47 +61,43 @@ class QuakeHeap(Heap):
         self.__update_heights(parent, sibling.height + 1)
       self.roots.append(node)
     node.value = new_val
-    self.__update_min()
+    if new_val < self.minimum.value:
+      self.minimum = node
 
   def delete_min(self):
-    if len(self.roots) == 0:
+    if len(self.leaves) == 0:
       return None
     x = self.minimum
     self.roots.remove(x)
-
-    min_node = None
     for leaf in self.leaves:
       if leaf.name == x.name:
         min_node = leaf
         self.leaves.remove(leaf)
-        self.deleted.add(leaf.name)
-    assert(min_node is not None)
+        break
 
     # Remove path of nodes storing x
     left,right = x.left, x.right
     new_roots = []
     parent = x
     while left or right:
-      parent.left = None
-      parent.right = None
       if left and x.name == left.name:
         if right:
           right.parent = None
-          new_roots.append(right)
-        parent = left
+          self.__update_root_height(right) 
+          new_roots.append(right)           
         left, right = left.left, left.right
       elif right and x.name == right.name:
         if left:
           left.parent = None
+          self.__update_root_height(left)
           new_roots.append(left)
-        parent = right
         left, right = right.left, right.right
     self.roots.extend(new_roots)
 
     # Perform linking
     max_height = int(math.ceil(math.log(self.n, 1/self.alpha))) + 1
-    heights = [None]*(max_height)
     self.n -= 1
+    heights = [None]*(max_height)
     orig_roots = []
     orig_roots.extend(self.roots)
     
@@ -114,35 +109,28 @@ class QuakeHeap(Heap):
         heights[h] = None
         h += 1
       heights[h] = root
-    self.__update_min()
 
     # Check for quakes
     current_level = set() 
     current_level.update(self.leaves)
-
     new_roots = []
-
     for i in range(max_height):
       n_current = len(current_level)
-      parent_level = set()
+      parent_level = [] 
       for node in current_level:
         if node.parent and node.parent.name == node.name: 
-          parent_level.add(node.parent)
-        elif not node.parent:
-          new_roots.append(node)
+          parent_level.append(node.parent)
       n_parent = len(parent_level)
       if n_parent > self.alpha*n_current: 
-        self.roots = list(current_level)
+        self.roots = []
+        self.roots.extend(current_level)
         self.roots.extend(new_roots)
         for root in self.roots:
           root.parent = None
         break
       else:
         current_level = parent_level
-
-    for root in self.roots:
-      if root.name in self.deleted:
-        self.roots.remove(root)
+    
     self.__update_min()
     return min_node
 
@@ -158,11 +146,12 @@ class QuakeHeap(Heap):
     z = QuakeHeapNode(x.value)
 
     z.name = x.name
-    z.height = x.height + 1
+    z.height = max(x.height, y.height) + 1
     z.left = x
-    z.right = y
+    z.right = y 
     x.parent = z
     y.parent = z
+    
     self.roots.remove(x)
     self.roots.remove(y)
     self.roots.append(z)
@@ -184,6 +173,20 @@ class QuakeHeap(Heap):
         self.__update_heights(parent, new_h + 1)
       else:
         self.__update_heights(parent, sibling.height + 1) 
+
+  def __update_root_height(self, node):
+    """
+    Fixes height of node if it is cut into root
+    """
+    left, right = node.left, node.right
+    if left and right:
+      node.height = max(left.height, right.height) + 1
+    elif left:
+      node.height = left.height + 1
+    elif right:
+      node.height = right.height + 1
+    else:
+      node.height = 0
         
 def test():
   q = QuakeHeap()

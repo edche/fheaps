@@ -167,8 +167,8 @@ if __name__ == '__main__':
   heap_names = {BINARY_HEAP: 'Binary Heap', FIBONACCI_HEAP: 'Fibonacci Heap', QUAKE_HEAP: 'Quake Heap', FOUR_ARY_HEAP: '4-ary Heap',
       EIGHT_ARY_HEAP: '8-ary Heap', SIXTEEN_ARY_HEAP: '16-ary Heap'}
   verbose = False 
-  num_vert = 1000
-  num_edges = 5000
+  num_vert = 500
+  num_edges = 10000
   num_trials = 100
   average_time = [0]*len(heaps_to_test)
   print 'Graph Description: |V| = %d, |E| = %d' % (num_vert, num_edges)
