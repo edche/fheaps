@@ -47,20 +47,20 @@ class FibonacciHeap(Heap):
     orig_roots = []
     orig_roots.extend(self.roots)
 
-    for x in orig_roots:
-      r = x.rank
+    for root in orig_roots:
+      r = root.rank
       while ranks[r] is not None:
         y = ranks[r]
-        x = self.__link(x,y)
+        root = self.__link(root,y)
         ranks[r] = None
         r += 1
-      ranks[r] = x      
+      ranks[r] = root      
 
     #Update new minimum
     new_min = self.roots[0]
-    for x in self.roots:
-      if x.value < new_min.value:
-        new_min = x
+    for root in self.roots:
+      if root.value < new_min.value:
+        new_min = root
     self.min = new_min
     return min_el
       

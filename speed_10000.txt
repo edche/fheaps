@@ -1,0 +1,65 @@
+Graph Description: |V| = 10000, |E| = 1000000
+Trial #0: 
+PASSED
+Trial #1: 
+PASSED
+Trial #2: 
+PASSED
+Trial #3: 
+PASSED
+Trial #4: 
+PASSED
+Trial #5: 
+PASSED
+Trial #6: 
+PASSED
+Trial #7: 
+PASSED
+Trial #8: 
+PASSED
+Trial #9: 
+PASSED
+Trial #10: 
+PASSED
+Trial #11: 
+PASSED
+Trial #12: 
+PASSED
+Trial #13: 
+PASSED
+Trial #14: 
+PASSED
+Trial #15: 
+PASSED
+Trial #16: 
+PASSED
+Trial #17: 
+PASSED
+Trial #18: 
+PASSED
+Trial #19: 
+PASSED
+Trial #20: 
+PASSED
+Trial #21: 
+PASSED
+Trial #22: 
+PASSED
+Trial #23: 
+PASSED
+Trial #24: 
+PASSED
+Trial #25: 
+PASSED
+Trial #26: 
+PASSED
+Trial #27: 
+PASSED
+Trial #28: 
+PASSED
+Trial #29: 
+PASSED
+Trial #30: 
+PASSED
+Trial #31: 
+PASSED

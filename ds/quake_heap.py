@@ -68,6 +68,7 @@ class QuakeHeap(Heap):
     if len(self.leaves) == 0:
       return None
     x = self.minimum
+    
     self.roots.remove(x)
     for leaf in self.leaves:
       if leaf.name == x.name:

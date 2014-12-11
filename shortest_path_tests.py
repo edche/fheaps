@@ -2,6 +2,7 @@ import ds.fibonacci_heap as fheap
 #import ds.binary_heap as bheap
 import ds.dheap as dheap
 import ds.quake_heap as qheap
+import ds.thin_heap as theap
 import graph.graph as graph
 import random
 import datetime
@@ -13,6 +14,7 @@ QUAKE_HEAP = 2
 FOUR_ARY_HEAP = 3
 EIGHT_ARY_HEAP = 4
 SIXTEEN_ARY_HEAP = 5
+THIN_HEAP = 6
 
 def make_heap(heap_type):
   if heap_type == BINARY_HEAP:
@@ -27,6 +29,8 @@ def make_heap(heap_type):
     return dheap.DHeap(8)
   elif heap_type == SIXTEEN_ARY_HEAP:
     return dheap.DHeap(16)
+  elif heap_type == THIN_HEAP:
+    return theap.ThinHeap()
   else:
     print 'Heap type not supported'
 
@@ -163,21 +167,26 @@ def run_test(G, s, t, heap_type):
   return dist, path, time
 
 if __name__ == '__main__':
-  heaps_to_test = [BINARY_HEAP, FIBONACCI_HEAP, QUAKE_HEAP, FOUR_ARY_HEAP, EIGHT_ARY_HEAP, SIXTEEN_ARY_HEAP]
+  heaps_to_test = [BINARY_HEAP, FIBONACCI_HEAP, QUAKE_HEAP, FOUR_ARY_HEAP, EIGHT_ARY_HEAP, SIXTEEN_ARY_HEAP, THIN_HEAP]
   heap_names = {BINARY_HEAP: 'Binary Heap', FIBONACCI_HEAP: 'Fibonacci Heap', QUAKE_HEAP: 'Quake Heap', FOUR_ARY_HEAP: '4-ary Heap',
-      EIGHT_ARY_HEAP: '8-ary Heap', SIXTEEN_ARY_HEAP: '16-ary Heap'}
+      EIGHT_ARY_HEAP: '8-ary Heap', SIXTEEN_ARY_HEAP: '16-ary Heap', THIN_HEAP: 'Thin Heap'}
   verbose = False 
-  num_vert = 500
-  num_edges = 10000
+  num_vert = 100
+  num_edges = 1000
   num_trials = 100
   average_time = [0]*len(heaps_to_test)
   print 'Graph Description: |V| = %d, |E| = %d' % (num_vert, num_edges)
 
-  for i in range(num_trials):    
-    times, result = test(num_vert,num_edges, heaps_to_test, verbose)
-    print "Trial #%d: " % (i)
-    print result
-    average_time = map(add, average_time, times)
+  for i in range(num_trials):
+    try:
+      times, result = test(num_vert,num_edges, heaps_to_test, verbose)
+      print "Trial #%d: " % (i)
+      print result
+      print times
+      average_time = map(add, average_time, times)
+    except Exception as error:
+      print error
+
   for i in range(len(heaps_to_test)):
     average_time[i] /= num_trials
   print 'Average Times for |V| = %d and |E| = %d:' % (num_vert, num_edges)
