@@ -51,8 +51,7 @@ class ThinHeap(Heap):
       self.minimum = None
       return min_el
     
-    ranks = [None]*(self.n + 1)#int(math.ceil(math.log(self.n + 1, 2)) + 1)
-
+    ranks = [None for _ in range(self.n)] 
     orig_roots = []
     orig_roots.extend(self.roots)
 
@@ -199,11 +198,11 @@ class ThinHeap(Heap):
 def test():
   t = ThinHeap()
   nodes = []
-  for i in range(100):
+  for i in range(1000):
     node = t.make_node(random.random())
     t.insert(node)
     nodes.append(node)
-  for j in range(100):
+  for j in range(1000):
     if random.random() > 0.5:
       x = t.delete_min()
       nodes.remove(x)

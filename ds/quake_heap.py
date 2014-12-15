@@ -98,7 +98,7 @@ class QuakeHeap(Heap):
     # Perform linking
     max_height = int(math.ceil(math.log(self.n, 1/self.alpha))) + 1
     self.n -= 1
-    heights = [None]*(max_height)
+    heights = [None for _ in range(max_height)]
     orig_roots = []
     orig_roots.extend(self.roots)
     
@@ -192,10 +192,10 @@ class QuakeHeap(Heap):
 def test():
   q = QuakeHeap()
   nodes = []
-  for i in range(100):
+  for i in range(1000):
     nodes.append(q.make_node(random.random()))
     q.insert(nodes[i])
-  for j in range(100):
+  for j in range(1000):
     if random.random() > 0.5:
       x = q.delete_min()
     else:

@@ -3,10 +3,12 @@ import ds.fibonacci_heap as fheap
 import ds.dheap as dheap
 import ds.quake_heap as qheap
 import ds.thin_heap as theap
+import ds.fat_heap as fatheap
 import graph.graph as graph
 import random
 import datetime
 from operator import add
+from argparse import ArgumentParser
 
 BINARY_HEAP = 0
 FIBONACCI_HEAP = 1
@@ -15,6 +17,10 @@ FOUR_ARY_HEAP = 3
 EIGHT_ARY_HEAP = 4
 SIXTEEN_ARY_HEAP = 5
 THIN_HEAP = 6
+FAT_HEAP = 7
+heaps_to_test = [BINARY_HEAP, FIBONACCI_HEAP, QUAKE_HEAP, FOUR_ARY_HEAP, EIGHT_ARY_HEAP, SIXTEEN_ARY_HEAP, THIN_HEAP, FAT_HEAP]
+heap_names = {BINARY_HEAP: 'Binary Heap', FIBONACCI_HEAP: 'Fibonacci Heap', QUAKE_HEAP: 'Quake Heap', FOUR_ARY_HEAP: '4-ary Heap',
+    EIGHT_ARY_HEAP: '8-ary Heap', SIXTEEN_ARY_HEAP: '16-ary Heap', THIN_HEAP: 'Thin Heap', FAT_HEAP: 'Fat Heap'}
 
 def make_heap(heap_type):
   if heap_type == BINARY_HEAP:
@@ -31,6 +37,8 @@ def make_heap(heap_type):
     return dheap.DHeap(16)
   elif heap_type == THIN_HEAP:
     return theap.ThinHeap()
+  elif  heap_type == FAT_HEAP:
+    return fatheap.FatHeap()
   else:
     print 'Heap type not supported'
 
@@ -85,42 +93,6 @@ def dijkstra(G, s, t, heap_type):
   path.reverse()
   return d, path
   
-def sanity():
-  """
-  Quick sanity checks
-  G =
-      2 - 5 - 9
-    / | \ |   |
-  1 - 3 - 6 - 8
-    \ | / | /
-      4 - 7
-  Weights are randomly generated (0,1)
-  """
-  V = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-  E = [(1,2), (1,3), (1,4), 
-       (2,3), (2,5), (2,6),
-       (3,6), (3,4),
-       (4,7), (4,6),
-       (5,9), (6,8), (7,8), (8,9)]
-  W = {}
-  for e in E:
-    W[e] = random.random()
-
-  G = graph.Graph(V, E, W)
-  s = 1
-  t = 9
-  b_dist, b_path = dijkstra(G, s, t, BINARY_HEAP)
-  f_dist, f_path = dijkstra(G, s, t, FIBONACCI_HEAP)
-  q_dist, q_path = dijkstra(G, s, t, QUAKE_HEAP)
-  print 'Binary Heap Solution: %f' % (b_dist[t])
-  print 'Binary Heap Path: ',
-  print b_path 
-  print 'Fibonacci Heap Solution: %f' % (f_dist[t])
-  print 'Fibonacci Heap Path: ',
-  print f_path
-  print 'Quake Heap Solution: %f' % (q_dist[t])
-  print 'Quake Heap Path: ',
-  print q_path
 
 def test(num_vertices, num_edges, heaps_to_test, verbose):
   V = range(num_vertices)
@@ -150,10 +122,11 @@ def test(num_vertices, num_edges, heaps_to_test, verbose):
     dists[i] = dist
     paths[i] = path
     times[i] = time
-    
+    '''
   if not all(dists[0] == dist for dist in dists):
     result = "FAILED"
     print dists
+    '''
   if not all(paths[0] == path for path in paths):
     result = "FAILED"
     print paths
@@ -167,13 +140,17 @@ def run_test(G, s, t, heap_type):
   return dist, path, time
 
 if __name__ == '__main__':
-  heaps_to_test = [BINARY_HEAP, FIBONACCI_HEAP, QUAKE_HEAP, FOUR_ARY_HEAP, EIGHT_ARY_HEAP, SIXTEEN_ARY_HEAP, THIN_HEAP]
-  heap_names = {BINARY_HEAP: 'Binary Heap', FIBONACCI_HEAP: 'Fibonacci Heap', QUAKE_HEAP: 'Quake Heap', FOUR_ARY_HEAP: '4-ary Heap',
-      EIGHT_ARY_HEAP: '8-ary Heap', SIXTEEN_ARY_HEAP: '16-ary Heap', THIN_HEAP: 'Thin Heap'}
-  verbose = False 
-  num_vert = 100
-  num_edges = 1000
-  num_trials = 100
+  parser = ArgumentParser()
+  parser.add_argument('-V', type=int, help='number of vertices')
+  parser.add_argument('-E', type=int, help='number of edges')
+  parser.add_argument('-q', action='store_true', default=True, help='quiet mode')
+  parser.add_argument('-t', type=int, help='number of trials')
+  args = parser.parse_args()
+
+  verbose = args.q
+  num_vert = args.V
+  num_edges = args.E
+  num_trials = args.t
   average_time = [0]*len(heaps_to_test)
   print 'Graph Description: |V| = %d, |E| = %d' % (num_vert, num_edges)
 
